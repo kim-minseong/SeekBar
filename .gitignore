@@ -1,0 +1,16 @@
+# Finder
+.DS_Store
+
+# Xcode - User data
+xcuserdata/
+DerivedData/
+
+# Swift Package Manager - Build files
+/Packages
+.build
+
+# Swift Package Manager - Configuration files
+.swiftpm
+
+# Network Configuration
+.netrc

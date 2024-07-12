@@ -7,18 +7,28 @@ import SwiftUI
 
 struct Track: View {
     let value: CGFloat
+    var bufferedValue: CGFloat?
     let bounds: ClosedRange<CGFloat>
     
     // TODO: Encapsulate properties related to appearance.
     let activeTrackColor: Color = .accentColor
     let inactiveTrackColor: Color = .gray.opacity(0.3)
+    let bufferedTrackColor: Color = .white.opacity(0.6)
     let cornerRadius: CGFloat = 4
     let trackHeight: CGFloat = 4
+    
+    let gapWidth: CGFloat = 4
     
     var body: some View {
         Canvas { context, size in
             // Inactive track
             context.drawTrack(size: size, color: inactiveTrackColor, width: size.width, trackHeight: trackHeight, cornerRadius: cornerRadius)
+            
+            // Buffer track
+            if let bufferedValue {
+                let bufferedWidth = width(for: bufferedValue, in: bounds, with: size.width)
+                context.drawTrack(size: size, color: bufferedTrackColor, width: bufferedWidth, trackHeight: trackHeight, cornerRadius: cornerRadius)
+            }
             
             // Active track
             let activeWidth = width(for: value, in: bounds, with: size.width)
@@ -68,12 +78,22 @@ extension GraphicsContext {
 // MARK: - Preview
 
 struct Track_Previews: PreviewProvider {
-    static let previewName = "Track Preview"
+    static let trackWithBufferPreviewName = "Track With Buffer Preview"
+    static let defaultTrackPreviewName = "Default Track Preview"
+    
     static var previews: some View {
-        Track(value: 0.5, bounds: 0.0...1.0)
-            .frame(height: 4)
-            .padding()
-            .previewDisplayName(previewName)
-            .previewLayout(.sizeThatFits)
+        Group {
+            Track(value: 0.3, bounds: 0.0...1.0)
+                .frame(height: 4)
+                .padding()
+                .previewDisplayName(defaultTrackPreviewName)
+                .previewLayout(.sizeThatFits)
+            
+            Track(value: 0.5, bufferedValue: 0.55, bounds: 0.0...1.0)
+                .frame(height: 4)
+                .padding()
+                .previewDisplayName(trackWithBufferPreviewName)
+                .previewLayout(.sizeThatFits)
+        }
     }
 }

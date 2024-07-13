@@ -31,18 +31,15 @@ public extension View {
     ///
     /// - Parameters:
     ///   - trackHeight: The height of the track.
-    ///   - activeTrackHeight: The height of the active track.
     ///   - segmentGap: The gap between segments of the track.
     ///
     /// - Note: For default dimension values, see [TrackDefaults](x-source-tag://TrackDefaults)
     func trackDimensions(
         trackHeight: CGFloat = TrackDefaults.trackHeight,
-        activeTrackHeight: CGFloat = TrackDefaults.trackHeight,
         segmentGap: CGFloat = TrackDefaults.segmentGap
     ) -> some View {
         let trackDimensions = TrackDimensions(
             trackHeight: trackHeight,
-            activeTrackHeight: activeTrackHeight,
             segmentGap: segmentGap
         )
         return environment(\.trackDimensions, trackDimensions)

@@ -15,10 +15,9 @@ public struct SeekBar: View {
     private let onEditingChanged: (Bool) -> Void
     
     @State private var dragStartOffset: CGFloat = 0
-    @GestureState private var isDragging: Bool = false
     
     private var seekBarMaxHeight: CGFloat {
-        max(trackDimensions.trackMaxHeight, handleDimensions.handleSize)
+        max(trackDimensions.trackHeight, handleDimensions.handleSize)
     }
     
     public var body: some View {
@@ -27,15 +26,13 @@ public struct SeekBar: View {
             let availableWidth = proxy.size.width - handleSize
             
             Track(value: value, bounds: bounds)
+                .frame(height: trackDimensions.trackHeight)
             
             Handle()
                 .frame(width: handleSize, height: handleSize)
                 .offset(x: calculateOffset(for: value, within: bounds, with: availableWidth))
                 .gesture(
                     DragGesture(minimumDistance: 0)
-                        .updating($isDragging) { _, state, _ in
-                            state = true
-                        }
                         .onChanged { dragValue in
                             handleDragChange(dragValue: dragValue, availableWidth: availableWidth)
                             onEditingChanged(true)

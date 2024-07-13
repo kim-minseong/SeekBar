@@ -23,7 +23,7 @@ struct Track: View {
                 size: size,
                 color: trackColors.inactiveTrackColor,
                 width: size.width,
-                height: trackDimensions.trackHeight,
+                height: size.height,
                 trackShape: trackShape
             )
             
@@ -34,7 +34,7 @@ struct Track: View {
                     size: size,
                     color: trackColors.bufferedTrackColor,
                     width: bufferedWidth,
-                    height: trackDimensions.activeTrackHeight,
+                    height: size.height,
                     trackShape: trackShape
                 )
             }
@@ -45,7 +45,7 @@ struct Track: View {
                 size: size,
                 color: trackColors.activeTrackColor,
                 width: activeWidth,
-                height: trackDimensions.activeTrackHeight,
+                height: size.height,
                 trackShape: trackShape
             )
             
@@ -58,7 +58,7 @@ struct Track: View {
                     segmentContext.drawGap(
                         size: size,
                         width: trackDimensions.segmentGap,
-                        height: trackDimensions.trackHeight,
+                        height: size.height,
                         segment: segment
                     )
                 }

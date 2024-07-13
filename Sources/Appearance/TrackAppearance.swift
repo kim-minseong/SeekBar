@@ -25,16 +25,10 @@ struct TrackColors {
 ///
 /// - Parameters:
 ///   - trackHeight: The height of the track.
-///   - activeTrackHeight: The height of the active track.
 ///   - segmentGap: The gap between segments of the track.
 struct TrackDimensions {
     var trackHeight: CGFloat = TrackDefaults.trackHeight
-    var activeTrackHeight: CGFloat = TrackDefaults.trackHeight
     var segmentGap: CGFloat = TrackDefaults.segmentGap
-    
-    var trackMaxHeight: CGFloat {
-        return max(trackHeight, activeTrackHeight)
-    }
 }
 
 // MARK: - Track Shape

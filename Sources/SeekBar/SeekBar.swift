@@ -6,42 +6,47 @@
 import SwiftUI
 
 public struct SeekBar: View {
-    // The current value represented by the seek bar, bound to an external state.
-    @Binding var value: CGFloat
+    @Environment(\.trackDimensions) private var trackDimensions
+    @Environment(\.handleDimensions) private var handleDimensions
     
-    // The offset of the handle when the drag gesture starts, used to calculate
-    // the new position during dragging.
+    // The current value represented by the seek bar, bound to an external state.
+    @Binding private var value: CGFloat
+    private let bounds: ClosedRange<CGFloat>
+    private let onEditingChanged: (Bool) -> Void
+    
     @State private var dragStartOffset: CGFloat = 0
-    // A state variable that tracks whether the handle is currently being dragged.
     @GestureState private var isDragging: Bool = false
     
-    let step: CGFloat
-    let bounds: ClosedRange<CGFloat>
-    let onEditingChanged: (Bool) -> Void
-    
-    var handleWidth: CGFloat = 27
+    private var seekBarMaxHeight: CGFloat {
+        max(trackDimensions.trackMaxHeight, handleDimensions.handleSize)
+    }
     
     public var body: some View {
         GeometryReader { proxy in
-            let availableWidth = proxy.size.width - handleWidth
+            let handleSize = handleDimensions.handleSize
+            let availableWidth = proxy.size.width - handleSize
             
-            ZStack(alignment: .leading) {
-                Track(value: value, bounds: bounds)
-                
-                Handle()
-                    .frame(width: handleWidth, height: handleWidth)
-                    .offset(x: calculateOffset(for: value, within: bounds, with: availableWidth))
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { dragValue in
-                                handleDragChange(dragValue: dragValue, availableWidth: availableWidth)
-                            }
-                            .onEnded { _ in
-                                dragStartOffset = 0
-                            }
-                    )
-            }
+            Track(value: value, bounds: bounds)
+            
+            Handle()
+                .frame(width: handleSize, height: handleSize)
+                .offset(x: calculateOffset(for: value, within: bounds, with: availableWidth))
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .updating($isDragging) { _, state, _ in
+                            state = true
+                        }
+                        .onChanged { dragValue in
+                            handleDragChange(dragValue: dragValue, availableWidth: availableWidth)
+                            onEditingChanged(true)
+                        }
+                        .onEnded { _ in
+                            dragStartOffset = 0
+                            onEditingChanged(false)
+                        }
+                )
         }
+        .frame(height: seekBarMaxHeight)
     }
     
     /// Calculates the offset for the handle based on the current value, bounds, and available width.
@@ -70,7 +75,7 @@ public struct SeekBar: View {
         // Calculate the new handle position within the available width
         let newValue = min(max(0, dragValue.location.x - dragStartOffset), availableWidth)
         let normalized = newValue / availableWidth
-        let steppedValue = (round(normalized * (bounds.upperBound - bounds.lowerBound) / step) * step) + bounds.lowerBound
-        value = steppedValue
+        let normalizedValue = normalized * (bounds.upperBound - bounds.lowerBound) + bounds.lowerBound
+        value = normalizedValue
     }
 }

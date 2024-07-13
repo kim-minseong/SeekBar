@@ -6,35 +6,48 @@
 import SwiftUI
 
 struct Track: View {
+    @Environment(\.trackColors) var trackColors
+    @Environment(\.trackDimensions) var trackDimensions
+    @Environment(\.trackShape) var trackShape
+    
     let value: CGFloat
     var bufferedValue: CGFloat?
     let bounds: ClosedRange<CGFloat>
     
     var timelineSegments: [TimelineSegmentPoint] = []
     
-    // TODO: Encapsulate properties related to appearance.
-    let activeTrackColor: Color = .accentColor
-    let inactiveTrackColor: Color = .gray.opacity(0.3)
-    let bufferedTrackColor: Color = .white.opacity(0.6)
-    let cornerRadius: CGFloat = 4
-    let trackHeight: CGFloat = 4
-    
-    let gapWidth: CGFloat = 4
-    
     var body: some View {
         Canvas { context, size in
             // Inactive track
-            context.drawLine(size: size, color: inactiveTrackColor, width: size.width, height: trackHeight, cornerRadius: cornerRadius)
+            context.drawLine(
+                size: size,
+                color: trackColors.inactiveTrackColor,
+                width: size.width,
+                height: trackDimensions.trackHeight,
+                trackShape: trackShape
+            )
             
             // Buffer track
             if let bufferedValue {
                 let bufferedWidth = width(for: bufferedValue, in: bounds, with: size.width)
-                context.drawLine(size: size, color: bufferedTrackColor, width: bufferedWidth, height: trackHeight, cornerRadius: cornerRadius)
+                context.drawLine(
+                    size: size,
+                    color: trackColors.bufferedTrackColor,
+                    width: bufferedWidth,
+                    height: trackDimensions.activeTrackHeight,
+                    trackShape: trackShape
+                )
             }
             
             // Active track
             let activeWidth = width(for: value, in: bounds, with: size.width)
-            context.drawLine(size: size, color: activeTrackColor, width: activeWidth, height: trackHeight, cornerRadius: cornerRadius)
+            context.drawLine(
+                size: size,
+                color: trackColors.activeTrackColor,
+                width: activeWidth,
+                height: trackDimensions.activeTrackHeight,
+                trackShape: trackShape
+            )
             
             // Draws a gap between timeline segments if any exist.
             if !timelineSegments.isEmpty {
@@ -44,8 +57,8 @@ struct Track: View {
                 for segment in timelineSegments {
                     segmentContext.drawGap(
                         size: size,
-                        width: gapWidth,
-                        height: trackHeight,
+                        width: trackDimensions.segmentGap,
+                        height: trackDimensions.trackHeight,
                         segment: segment
                     )
                 }
@@ -78,7 +91,7 @@ extension GraphicsContext {
     ///   - width: The width of the line.
     ///   - height: The height of the line.
     ///   - cornerRadius: The corner radius of the line (optional).
-    func drawLine(size: CGSize, color: Color, width: CGFloat, height: CGFloat, cornerRadius: CGFloat? = nil) {
+    func drawLine(size: CGSize, color: Color, width: CGFloat, height: CGFloat, trackShape: TrackShape) {
         let lineRect = CGRect(
             x: 0,
             y: (size.height - height) / 2,
@@ -86,9 +99,9 @@ extension GraphicsContext {
             height: height
         )
         let linePath = Path { path in
-            if let cornerRadius {
+            if case .rounded(let radius) = trackShape {
                 // Add rounded path when cornderRadius value is exists.
-                path.addRoundedRect(in: lineRect, cornerSize: CGSize(width: cornerRadius, height: cornerRadius))
+                path.addRoundedRect(in: lineRect, cornerSize: CGSize(width: radius, height: radius))
             } else {
                 path.addRect(lineRect)
             }

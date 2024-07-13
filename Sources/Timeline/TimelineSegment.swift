@@ -1,6 +1,6 @@
 /*
  Abstract:
- 
+ A model represents the timeline segments for dividing tracks based on timelines.
  */
 
 import Foundation

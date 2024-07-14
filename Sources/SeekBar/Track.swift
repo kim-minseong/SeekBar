@@ -13,7 +13,6 @@ struct Track: View {
     let value: CGFloat
     var bufferedValue: CGFloat?
     let bounds: ClosedRange<CGFloat>
-    
     var timelineSegments: [TimelineSegmentPoint] = []
     
     var body: some View {
@@ -140,7 +139,8 @@ struct Track_Previews: PreviewProvider {
     static let timelineSegments = [
         TimelineSegmentPoint(name: "Timeline 1", startPoint: 0.0, endPoint: 0.2),
         TimelineSegmentPoint(name: "Timeline 2", startPoint: 0.2, endPoint: 0.6),
-        TimelineSegmentPoint(name: "Timeline 3", startPoint: 0.6, endPoint: 0.8)
+        TimelineSegmentPoint(name: "Timeline 3", startPoint: 0.6, endPoint: 0.8),
+        TimelineSegmentPoint(name: "Timeline 4", startPoint: 0.8, endPoint: 1.0),
     ]
     
     static var previews: some View {

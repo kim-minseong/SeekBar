@@ -34,7 +34,7 @@ public struct TimelineSegment {
 ///   - name: The name of the segment.
 ///   - startPoint: The starting position of the segment as a fraction of the view's width (0.0 to 1.0).
 ///   - endPoint: The ending position of the segment as a fraction of the view's width (0.0 to 1.0).
-struct TimelineSegmentPoint {
+struct TimelineSegmentPoint: Equatable {
     let name: String
     let startPoint: CGFloat
     let endPoint: CGFloat

@@ -11,6 +11,7 @@
 		6765F9332C3D5D5100E7BC63 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6765F9322C3D5D5100E7BC63 /* ContentView.swift */; };
 		6765F9352C3D5D5200E7BC63 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6765F9342C3D5D5200E7BC63 /* Assets.xcassets */; };
 		6765F9382C3D5D5200E7BC63 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6765F9372C3D5D5200E7BC63 /* Preview Assets.xcassets */; };
+		67DEC2DE2C4564C7002EED1F /* SeekBar in Frameworks */ = {isa = PBXBuildFile; productRef = 67DEC2DD2C4564C7002EED1F /* SeekBar */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67DEC2DE2C4564C7002EED1F /* SeekBar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,9 @@
 			dependencies = (
 			);
 			name = SeekBarSamples;
+			packageProductDependencies = (
+				67DEC2DD2C4564C7002EED1F /* SeekBar */,
+			);
 			productName = SeekBarSamples;
 			productReference = 6765F92D2C3D5D5100E7BC63 /* SeekBarSamples.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 6765F9242C3D5D5100E7BC63;
+			packageReferences = (
+				67DEC2DC2C4564C7002EED1F /* XCRemoteSwiftPackageReference "SeekBar" */,
+			);
 			productRefGroup = 6765F92E2C3D5D5100E7BC63 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -344,6 +352,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		67DEC2DC2C4564C7002EED1F /* XCRemoteSwiftPackageReference "SeekBar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kim-minseong/SeekBar";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		67DEC2DD2C4564C7002EED1F /* SeekBar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 67DEC2DC2C4564C7002EED1F /* XCRemoteSwiftPackageReference "SeekBar" */;
+			productName = SeekBar;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6765F9252C3D5D5100E7BC63 /* Project object */;
 }

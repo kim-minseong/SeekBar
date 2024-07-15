@@ -5,6 +5,53 @@
 
 import SwiftUI
 
+/// A control for selecting a value from a bounded linear range of values, similar to SwiftUI's `Slider`.
+///
+/// The` SeekBar` component is designed to facilitate easy display and manipulation of progress in video or audio players,
+/// and partially replace some functionalities of the simple SwiftUI `Slider`.
+///
+/// ```swift
+/// @State private var progress = 0.5
+///
+/// var body: some View {
+///     SeekBar(value: $progress)
+/// }
+///```
+///
+/// You can also use a `step` parameter to increment or decrement the value by the specified step within the bounds.
+///
+/// ```swift
+/// @State private var progress = 0.0
+///
+/// var body: some View {
+///     SeekBar(
+///         value: $progress,
+///         in: 0...1,
+///         step: 0.2
+///     )
+/// }
+/// ```
+///
+/// Additionally, the `onEditingChanged` closure allows you to perform various animations or change the state.
+/// 
+/// ```swift
+/// @State private var progress = 0.5
+/// @State private var isEditing = false
+///
+/// var body: some View {
+///     SeekBar(
+///         value: $progress,
+///         onEditingChange = { editing in
+///             withAnimation {
+///                 isEditing = editing
+///             }
+///         }
+///     )
+///     .handleDimension(
+///         handleSize: isEditing ? 16 : 12
+///     )
+/// }
+///
 public struct SeekBar: View {
     @Environment(\.trackDimensions) private var trackDimensions
     @Environment(\.handleDimensions) private var handleDimensions
@@ -13,27 +60,12 @@ public struct SeekBar: View {
     @Environment(\.trackAction) private var trackAction
     
     @Binding private var value: CGFloat
+    private let bufferedValue: CGFloat
     private let bounds: ClosedRange<CGFloat>
     private let step: CGFloat
     private let onEditingChanged: (Bool) -> Void
     
     @State private var dragStartOffset: CGFloat = 0
-    
-    private var seekBarMaxHeight: CGFloat {
-        return max(trackDimensions.trackHeight, handleDimensions.handleSize)
-    }
-    
-    private var isInteractiveWithTrack: Bool {
-        return interactive == .track
-    }
-    
-    private var isDisplayOnlyTrack: Bool {
-        return displayMode == .trackOnly
-    }
-    
-    private var isActionMoveWithValue: Bool {
-        return trackAction == .moveWithValue
-    }
     
     public var body: some View {
         GeometryReader { proxy in
@@ -41,16 +73,16 @@ public struct SeekBar: View {
             let availableWidth = proxy.size.width - handleSize
             
             ZStack(alignment: .leading) {
-                Track(value: value, bufferedValue: 0, bounds: bounds)
+                Track(value: value, bufferedValue: bufferedValue, bounds: bounds)
                     .frame(height: trackDimensions.trackHeight)
-                    .allowsHitTesting(handleSize == 0 || (isInteractiveWithTrack || isActionMoveWithValue))
+                    .allowsHitTesting(allowsTrackHitTesting)
                     .gesture(dragGesture(availableWidth: availableWidth))
                 
                 Handle()
                     .frame(width: handleSize, height: handleSize)
                     .opacity(isDisplayOnlyTrack ? 0 : 1)
-                    .offset(x: calculateOffset(for: value, within: bounds, with: availableWidth))
-                    .allowsHitTesting(!isInteractiveWithTrack || isActionMoveWithValue)
+                    .offset(x: calculatePosition(for: value, within: bounds, with: availableWidth))
+                    .allowsHitTesting(allowsHandleHitTesting)
                     .gesture(dragGesture(availableWidth: availableWidth))
             }
         }
@@ -82,35 +114,6 @@ public struct SeekBar: View {
             }
     }
     
-    /// Calculates the offset for the handle based on the current value, bounds, and available width.
-    ///
-    /// - Parameters:
-    ///   - value: The current value to be represented by the handle.
-    ///   - bounds: The range within which the value is constrained.
-    ///   - availableWidth: The total available width for the offset calculation.
-    ///
-    /// - Returns: The calculated offset as a `CGFloat`.
-    private func calculateOffset(for value: CGFloat, within bounds: ClosedRange<CGFloat>, with availableWidth: CGFloat) -> CGFloat {
-        return (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound) * availableWidth
-    }
-    
-    /// Calculates the normalized value based on the given position within the specified bounds and available width.
-    ///
-    /// - Parameters:
-    ///   - position: The position to be normalized.
-    ///   - bounds: The range within which the value is constrained.
-    ///   - availableWidth: The total width to scale the normalized value.
-    ///   - step: The step value to snap the value to.
-    ///
-    /// - Returns: The calculated normalized value as a `CGFloat`.
-    private func normalizedValue(for position: CGFloat, within bounds: ClosedRange<CGFloat>, with availableWidth: CGFloat, step: CGFloat) -> CGFloat {
-        let clampedPosition = min(max(0, position), availableWidth)
-        let normalized = clampedPosition / availableWidth
-        let steppedValue = (round(normalized * (bounds.upperBound - bounds.lowerBound) / step) * step) + bounds.lowerBound
-        //        return normalized * (bounds.upperBound - bounds.lowerBound) + bounds.lowerBound
-        return steppedValue
-    }
-    
     /// The drag change event by updating the current value based on the drag gesture's position.
     ///
     /// - Parameters:
@@ -119,10 +122,107 @@ public struct SeekBar: View {
     private func updateValueWithDrag(dragValue: DragGesture.Value, availableWidth: CGFloat) {
         if dragStartOffset == 0 {
             // Calculate the initial offset to ensure smooth handle movement
-            dragStartOffset = dragValue.startLocation.x - calculateOffset(for: value, within: bounds, with: availableWidth)
+            dragStartOffset = dragValue.startLocation.x - calculatePosition(for: value, within: bounds, with: availableWidth)
         }
         
         // Calculate the new handle position within the available width
         value = normalizedValue(for: dragValue.location.x - dragStartOffset, within: bounds, with: availableWidth, step: step)
+    }
+}
+
+// MARK: - Helper stored property
+
+extension SeekBar {
+    /// Calculates the maximum height of the seek bar, considering both the track height and handle size.
+    private var seekBarMaxHeight: CGFloat {
+        return max(trackDimensions.trackHeight, handleDimensions.handleSize)
+    }
+    
+    /// Determines if the seek bar is interactive with the track based on the current environment setting.
+    private var isInteractiveWithTrack: Bool {
+        return interactive == .track
+    }
+    
+    /// Determines if the seek bar displays only the track, without interactive handles.
+    private var isDisplayOnlyTrack: Bool {
+        return displayMode == .trackOnly
+    }
+    
+    /// Determines if the seek bar action mode involves moving the value along the select position.
+    private var isActionMoveWithValue: Bool {
+        return trackAction == .moveWithValue
+    }
+    
+    /// Determines if the track allows hit testing based on the handle size and interactive mode.
+    private var allowsTrackHitTesting: Bool {
+        return handleDimensions.handleSize == 0 || (isInteractiveWithTrack || isActionMoveWithValue)
+    }
+    
+    /// Determines if the handle allows hit testing based on the interactive mode.
+    private var allowsHandleHitTesting: Bool {
+        return !isInteractiveWithTrack || isActionMoveWithValue
+    }
+}
+
+// MARK: - Initializers
+
+extension SeekBar {
+    /// Creates a `SeekBar` to select a value from a given range based on the specified step.
+    ///
+    /// - Parameters:
+    ///   - value: The selected value within `bounds`.
+    ///   - bounds: The range of allowable values. Defaults to `0...1`
+    ///   - step: The distance by which the valid value changes. Defaults to `0.000001`
+    ///   - onEditingChanged: A closure that is called when editing begins and ends.
+    public init<V>(
+        value: Binding<V>,
+        in bounds: ClosedRange<V> = 0...1,
+        step: V.Stride = 0.000001,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in }
+    ) where V : BinaryFloatingPoint, V.Stride : BinaryFloatingPoint {
+        precondition(
+            step > 0 && abs(CGFloat(step)) <= abs(CGFloat(bounds.upperBound - bounds.lowerBound)),
+            "Step value exceeds the bounds. The step value must be less than or equal to the range defined by the bounds"
+        )
+        
+        self._value = Binding(
+            get: { CGFloat(value.wrappedValue.clamped(in: bounds)) },
+            set: { value.wrappedValue = V($0) }
+        )
+        self.bufferedValue = 0
+        self.bounds = CGFloat(bounds.lowerBound)...CGFloat(bounds.upperBound)
+        self.step = CGFloat(step)
+        self.onEditingChanged = onEditingChanged
+    }
+    
+    /// Creates a `SeekBar` to select a value from a given range based on the specified step and provide a buffered value.
+    /// suitable for scenarios like video or audio players where buffered values are used.
+    ///
+    /// - Parameters:
+    ///   - value: The selected value within `bounds`.
+    ///   - bufferedValue: The buffered value within `bounds`.
+    ///   - bounds: The range of allowable values. Defaults to `0...1`
+    ///   - step: The distance by which the valid value changes. Defaults to `0.000001`
+    ///   - onEditingChanged: A closure that is called when editing begins and ends.
+    public init<V>(
+        value: Binding<V>,
+        bufferedValue: V,
+        in bounds: ClosedRange<V> = 0...1,
+        step: V.Stride = 0.000001,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in }
+    ) where V : BinaryFloatingPoint, V.Stride : BinaryFloatingPoint {
+        precondition(
+            step > 0 && abs(CGFloat(step)) <= abs(CGFloat(bounds.upperBound - bounds.lowerBound)),
+            "Step value exceeds the bounds. The step value must be less than or equal to the range defined by the bounds"
+        )
+        
+        self._value = Binding(
+            get: { CGFloat(value.wrappedValue.clamped(in: bounds)) },
+            set: { value.wrappedValue = V($0) }
+        )
+        self.bufferedValue = CGFloat(bufferedValue)
+        self.bounds = CGFloat(bounds.lowerBound)...CGFloat(bounds.upperBound)
+        self.step = CGFloat(step)
+        self.onEditingChanged = onEditingChanged
     }
 }

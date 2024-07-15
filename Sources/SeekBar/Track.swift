@@ -26,29 +26,17 @@ struct Track: View {
                 // Buffered Track.
                 RoundedRectangle(cornerRadius: trackDimensions.bufferedTrackCornerRadius)
                     .foregroundStyle(trackColors.bufferedTrackColor)
-                    .frame(width: width(for: bufferedValue, in: bounds, with: availableWidth))
+                    .frame(width: calculatePosition(for: bufferedValue, within: bounds, with: availableWidth))
                 
                 // Active Track.
                 RoundedRectangle(cornerRadius: trackDimensions.activeTrackCornerRadius)
                     .foregroundStyle(trackColors.activeTrackColor)
-                    .frame(width: width(for: value, in: bounds, with: availableWidth))
+                    .frame(width: calculatePosition(for: value, within: bounds, with: availableWidth))
                 
             }
             .clipShape(RoundedRectangle(cornerRadius: trackDimensions.inactiveTrackCornerRadius))
             .drawingGroup()
         }
-    }
-    
-    /// Calculates the width based on the given value within the specified bounds and availableWidth width.
-    ///
-    /// - Parameters:
-    ///   - value: The value to calculate the width for.
-    ///   - bounds: The closed range within which the value should be considered.
-    ///   - availableWidth: The total width to scale the calculated width.
-    /// - Returns: The calculated width as a CGFloat.
-    private func width(for value: CGFloat, in bounds: ClosedRange<CGFloat>, with availableWidth: CGFloat) -> CGFloat {
-        let ratio = (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)
-        return availableWidth * ratio
     }
 }
 

@@ -72,5 +72,6 @@ struct Track_Previews: PreviewProvider {
                 .previewDisplayName(trackWithBufferPreviewName)
                 .previewLayout(.sizeThatFits)
         }
+        .preferredColorScheme(.dark)
     }
 }

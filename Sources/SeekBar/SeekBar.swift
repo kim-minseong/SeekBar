@@ -14,6 +14,7 @@ public struct SeekBar: View {
     
     @Binding private var value: CGFloat
     private let bounds: ClosedRange<CGFloat>
+    private let step: CGFloat
     private let onEditingChanged: (Bool) -> Void
     
     @State private var dragStartOffset: CGFloat = 0
@@ -68,7 +69,7 @@ public struct SeekBar: View {
                 if abs(dragValue.startLocation.x - dragValue.location.x) > 0 {
                     // Updates the value if moveWithValue action mode requires immediate value change.
                     if isActionMoveWithValue {
-                        value = normalizedValue(for: dragValue.startLocation.x, within: bounds, with: availableWidth)
+                        value = normalizedValue(for: dragValue.startLocation.x, within: bounds, with: availableWidth, step: step)
                     }
                     // Updates the position based on drag movement.
                     updateValueWithDrag(dragValue: dragValue, availableWidth: availableWidth)
@@ -99,12 +100,15 @@ public struct SeekBar: View {
     ///   - position: The position to be normalized.
     ///   - bounds: The range within which the value is constrained.
     ///   - availableWidth: The total width to scale the normalized value.
+    ///   - step: The step value to snap the value to.
     ///
     /// - Returns: The calculated normalized value as a `CGFloat`.
-    private func normalizedValue(for position: CGFloat, within bounds: ClosedRange<CGFloat>, with availableWidth: CGFloat) -> CGFloat {
+    private func normalizedValue(for position: CGFloat, within bounds: ClosedRange<CGFloat>, with availableWidth: CGFloat, step: CGFloat) -> CGFloat {
         let clampedPosition = min(max(0, position), availableWidth)
         let normalized = clampedPosition / availableWidth
-        return normalized * (bounds.upperBound - bounds.lowerBound) + bounds.lowerBound
+        let steppedValue = (round(normalized * (bounds.upperBound - bounds.lowerBound) / step) * step) + bounds.lowerBound
+        //        return normalized * (bounds.upperBound - bounds.lowerBound) + bounds.lowerBound
+        return steppedValue
     }
     
     /// The drag change event by updating the current value based on the drag gesture's position.
@@ -119,6 +123,6 @@ public struct SeekBar: View {
         }
         
         // Calculate the new handle position within the available width
-        value = normalizedValue(for: dragValue.location.x - dragStartOffset, within: bounds, with: availableWidth)
+        value = normalizedValue(for: dragValue.location.x - dragStartOffset, within: bounds, with: availableWidth, step: step)
     }
 }

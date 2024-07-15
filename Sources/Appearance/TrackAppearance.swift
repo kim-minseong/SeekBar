@@ -41,11 +41,11 @@ struct TrackDimensions {
 /// - Tag: TrackDefaults
 public struct TrackDefaults {
     /// The default color for the active track.
-    public static let activeTrackColor: Color = .accentColor
+    public static let activeTrackColor: Color = Color(red: 201, green: 201, blue: 201)
     /// The default color for the  inactive track.
-    public static let inactiveTrackColor: Color = .gray.opacity(0.3)
+    public static let inactiveTrackColor: Color = .white.opacity(0.2)
     /// The default color for the buffered portion of the track.
-    public static let bufferedTrackColor: Color = .white.opacity(0.6)
+    public static let bufferedTrackColor: Color = .white.opacity(0.3)
     
     /// The default height of the track.
     public static let trackHeight: CGFloat = 4

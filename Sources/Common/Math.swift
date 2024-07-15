@@ -39,6 +39,7 @@ extension Comparable {
     ///
     /// - Parameters:
     ///   - bounds: The range within which to clamp the value.
+    ///
     /// - Returns: The clamped value, which will be within the bounds.
     func clamped(in bounds: ClosedRange<Self>) -> Self {
         min(max(self, bounds.lowerBound), bounds.upperBound)

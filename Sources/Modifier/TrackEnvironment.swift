@@ -30,16 +30,3 @@ extension EnvironmentValues {
         set { self[TrackDimensionsKey.self] = newValue }
     }
 }
-
-// MARK: - Track Shape Environment Key
-
-struct TrackShapeKey: EnvironmentKey {
-    static let defaultValue = TrackShape.rect
-}
-
-extension EnvironmentValues {
-    var trackShape: TrackShape {
-        get { self[TrackShapeKey.self] }
-        set { self[TrackShapeKey.self] = newValue }
-    }
-}

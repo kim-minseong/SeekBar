@@ -40,43 +40,42 @@ public struct SeekBar: View {
             let availableWidth = proxy.size.width - handleSize
             
             ZStack(alignment: .leading) {
-                Track(value: value, bounds: bounds)
+                Track(value: value, bufferedValue: 0, bounds: bounds)
                     .frame(height: trackDimensions.trackHeight)
-                    .allowsHitTesting(isInteractiveWithTrack || isActionMoveWithValue)
-                    .gesture(isActionMoveWithValue ? moveWithValueDragGesture(availableWidth: availableWidth) : nil)
-                    .gesture(!isActionMoveWithValue ? dragGesture(availableWidth: availableWidth) : nil)
+                    .allowsHitTesting(handleSize == 0 || (isInteractiveWithTrack || isActionMoveWithValue))
+                    .gesture(dragGesture(availableWidth: availableWidth))
                 
                 Handle()
                     .frame(width: handleSize, height: handleSize)
                     .opacity(isDisplayOnlyTrack ? 0 : 1)
                     .offset(x: calculateOffset(for: value, within: bounds, with: availableWidth))
                     .allowsHitTesting(!isInteractiveWithTrack || isActionMoveWithValue)
-                    .gesture(!isDisplayOnlyTrack ? dragGesture(availableWidth: availableWidth): nil)
+                    .gesture(dragGesture(availableWidth: availableWidth))
             }
         }
         .frame(height: seekBarMaxHeight)
     }
     
-    private func moveWithValueDragGesture(availableWidth: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 0)
-            .onChanged { dragValue in
-                onEditingChanged(true)
-                if abs(dragValue.startLocation.x - dragValue.location.x) > 0 {
-                    value = normalizedValue(for: dragValue.startLocation.x, within: bounds, with: availableWidth)
-                    updateValueWithDrag(dragValue: dragValue, availableWidth: availableWidth)
-                }
-            }.onEnded { _ in
-                onEditingChanged(false)
-            }
-    }
-    
+    /// Creates a `DragGesture` to handle dragging interactions.
+    ///
+    /// - Parameter availableWidth: The available width for calculating drag positions.
     private func dragGesture(availableWidth: CGFloat) -> some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { dragValue in
                 onEditingChanged(true)
-                updateValueWithDrag(dragValue: dragValue, availableWidth: availableWidth)
+                
+                // Check if there is a significant change in drag position.
+                if abs(dragValue.startLocation.x - dragValue.location.x) > 0 {
+                    // Updates the value if moveWithValue action mode requires immediate value change.
+                    if isActionMoveWithValue {
+                        value = normalizedValue(for: dragValue.startLocation.x, within: bounds, with: availableWidth)
+                    }
+                    // Updates the position based on drag movement.
+                    updateValueWithDrag(dragValue: dragValue, availableWidth: availableWidth)
+                }
             }
             .onEnded { _ in
+                // Resets the drag start offset.
                 dragStartOffset = 0
                 onEditingChanged(false)
             }

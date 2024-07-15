@@ -25,20 +25,14 @@ struct TrackColors {
 ///
 /// - Parameters:
 ///   - trackHeight: The height of the track.
-///   - segmentGap: The gap between segments of the track.
+///   - inactiveTrackCornerRadius: The corner radius of the inacitve track.
+///   - activeTrackCornerRadius: The corner radius of the active track.
+///   - bufferedTrackCornerRadius: The corner radius of the buffered track
 struct TrackDimensions {
     var trackHeight: CGFloat = TrackDefaults.trackHeight
-    var segmentGap: CGFloat = TrackDefaults.segmentGap
-}
-
-// MARK: - Track Shape
-
-/// A enumeration that represents the shape of the track.
-public enum TrackShape {
-    /// A rectangular track.
-    case rect
-    /// A track with rounded corners. The `radius` parameter sepcifies the corner radius.
-    case rounded(radius: CGFloat)
+    var inactiveTrackCornerRadius: CGFloat = 0
+    var activeTrackCornerRadius: CGFloat = 0
+    var bufferedTrackCornerRadius: CGFloat = 0
 }
 
 // MARK: - Track Defaults
@@ -55,8 +49,4 @@ public struct TrackDefaults {
     
     /// The default height of the track.
     public static let trackHeight: CGFloat = 4
-    /// The default gap between segments of the track.
-    public static let segmentGap: CGFloat = 2
-    /// The default corner radius of the track.
-    public static let cornerRadius: CGFloat = 4
 }

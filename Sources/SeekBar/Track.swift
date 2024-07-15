@@ -8,46 +8,35 @@ import SwiftUI
 struct Track: View {
     @Environment(\.trackColors) var trackColors
     @Environment(\.trackDimensions) var trackDimensions
-    @Environment(\.trackShape) var trackShape
     
     let value: CGFloat
-    var bufferedValue: CGFloat?
+    let bufferedValue: CGFloat
     let bounds: ClosedRange<CGFloat>
     
     var body: some View {
-        Canvas { context, size in
-            // Inactive track
-            context.drawLine(
-                size: size,
-                color: trackColors.inactiveTrackColor,
-                width: size.width,
-                height: size.height,
-                trackShape: trackShape
-            )
-            
-            // Buffer track
-            if let bufferedValue {
-                let bufferedWidth = width(for: bufferedValue, in: bounds, with: size.width)
-                context.drawLine(
-                    size: size,
-                    color: trackColors.bufferedTrackColor,
-                    width: bufferedWidth,
-                    height: size.height,
-                    trackShape: trackShape
-                )
+        GeometryReader { proxy in
+            let availableWidth = proxy.size.width
+            ZStack(alignment: .leading) {
+                
+                // Inactive Track.
+                RoundedRectangle(cornerRadius: trackDimensions.inactiveTrackCornerRadius)
+                    .foregroundStyle(trackColors.inactiveTrackColor)
+                    .frame(width: availableWidth)
+                
+                // Buffered Track.
+                RoundedRectangle(cornerRadius: trackDimensions.bufferedTrackCornerRadius)
+                    .foregroundStyle(trackColors.bufferedTrackColor)
+                    .frame(width: width(for: bufferedValue, in: bounds, with: availableWidth))
+                
+                // Active Track.
+                RoundedRectangle(cornerRadius: trackDimensions.activeTrackCornerRadius)
+                    .foregroundStyle(trackColors.activeTrackColor)
+                    .frame(width: width(for: value, in: bounds, with: availableWidth))
+                
             }
-            
-            // Active track
-            let activeWidth = width(for: value, in: bounds, with: size.width)
-            context.drawLine(
-                size: size,
-                color: trackColors.activeTrackColor,
-                width: activeWidth,
-                height: size.height,
-                trackShape: trackShape
-            )
+            .clipShape(RoundedRectangle(cornerRadius: trackDimensions.inactiveTrackCornerRadius))
+            .drawingGroup()
         }
-        .drawingGroup()
     }
     
     /// Calculates the width based on the given value within the specified bounds and availableWidth width.
@@ -63,36 +52,6 @@ struct Track: View {
     }
 }
 
-// MARK: - Canvas Context Extenstion
-
-extension GraphicsContext {
-    /// Draws a line with the specified size, color, and dimensions.
-    ///
-    /// - Parameters:
-    ///   - size: The size of the canvas.
-    ///   - color: The color of the line.
-    ///   - width: The width of the line.
-    ///   - height: The height of the line.
-    ///   - cornerRadius: The corner radius of the line (optional).
-    func drawLine(size: CGSize, color: Color, width: CGFloat, height: CGFloat, trackShape: TrackShape) {
-        let lineRect = CGRect(
-            x: 0,
-            y: (size.height - height) / 2,
-            width: width,
-            height: height
-        )
-        let linePath = Path { path in
-            if case .rounded(let radius) = trackShape {
-                // Add rounded path when cornderRadius value is exists.
-                path.addRoundedRect(in: lineRect, cornerSize: CGSize(width: radius, height: radius))
-            } else {
-                path.addRect(lineRect)
-            }
-        }
-        self.fill(linePath, with: .color(color))
-    }
-}
-
 // MARK: - Preview
 
 struct Track_Previews: PreviewProvider {
@@ -101,7 +60,7 @@ struct Track_Previews: PreviewProvider {
     
     static var previews: some View {
         Group {
-            Track(value: 0.3, bounds: 0.0...1.0)
+            Track(value: 0.3, bufferedValue: 0, bounds: 0.0...1.0)
                 .frame(height: 4)
                 .padding()
                 .previewDisplayName(defaultTrackPreviewName)

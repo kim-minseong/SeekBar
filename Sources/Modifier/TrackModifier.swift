@@ -31,27 +31,23 @@ public extension View {
     ///
     /// - Parameters:
     ///   - trackHeight: The height of the track.
-    ///   - segmentGap: The gap between segments of the track.
+    ///   - inactiveTrackCornerRadius: The corner radius of the inacitve track.
+    ///   - activeTrackCornerRadius: The corner radius of the active track.
+    ///   - bufferedTrackCornerRadius: The corner radius of the buffered track
     ///
     /// - Note: For default dimension values, see [TrackDefaults](x-source-tag://TrackDefaults)
     func trackDimensions(
         trackHeight: CGFloat = TrackDefaults.trackHeight,
-        segmentGap: CGFloat = TrackDefaults.segmentGap
+        inactiveTrackCornerRadius: CGFloat = 0,
+        activeTrackCornerRadius: CGFloat = 0,
+        bufferedTrackCornerRadius: CGFloat = 0
     ) -> some View {
         let trackDimensions = TrackDimensions(
             trackHeight: trackHeight,
-            segmentGap: segmentGap
+            inactiveTrackCornerRadius: inactiveTrackCornerRadius,
+            activeTrackCornerRadius: activeTrackCornerRadius,
+            bufferedTrackCornerRadius: bufferedTrackCornerRadius
         )
         return environment(\.trackDimensions, trackDimensions)
-    }
-    
-    /// Sets the shape for the track.
-    ///
-    /// - Parameters:
-    ///   - trackShape: The shape of the track.
-    ///
-    /// - Note: For default shape values, see [TrackDefaults](x-source-tag://TrackDefaults)
-    func trackShape(trackShape: TrackShape = .rect) -> some View {
-        return environment(\.trackShape, trackShape)
     }
 }

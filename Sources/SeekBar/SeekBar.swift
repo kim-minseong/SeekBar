@@ -15,17 +15,8 @@ public struct SeekBar: View {
     @Binding private var value: CGFloat
     private let bounds: ClosedRange<CGFloat>
     private let onEditingChanged: (Bool) -> Void
-    private var onSegmentChanged: (TimelineSegmentPoint) -> Void = { _ in }
-    
-    let timelineSegments = [
-        TimelineSegmentPoint(name: "Timeline 1", startPoint: 0.0, endPoint: 0.2),
-        TimelineSegmentPoint(name: "Timeline 2", startPoint: 0.2, endPoint: 0.6),
-        TimelineSegmentPoint(name: "Timeline 3", startPoint: 0.6, endPoint: 0.8),
-        TimelineSegmentPoint(name: "Timeline 4", startPoint: 0.8, endPoint: 1.0),
-    ]
     
     @State private var dragStartOffset: CGFloat = 0
-    @State private var currentSegment: TimelineSegmentPoint?
     
     private var seekBarMaxHeight: CGFloat {
         return max(trackDimensions.trackHeight, handleDimensions.handleSize)
@@ -49,7 +40,7 @@ public struct SeekBar: View {
             let availableWidth = proxy.size.width - handleSize
             
             ZStack(alignment: .leading) {
-                Track(value: value, bounds: bounds, timelineSegments: timelineSegments)
+                Track(value: value, bounds: bounds)
                     .frame(height: trackDimensions.trackHeight)
                     .allowsHitTesting(isInteractiveWithTrack || isActionMoveWithValue)
                     .gesture(isActionMoveWithValue ? moveWithValueDragGesture(availableWidth: availableWidth) : nil)
@@ -73,7 +64,6 @@ public struct SeekBar: View {
                 if abs(dragValue.startLocation.x - dragValue.location.x) > 0 {
                     value = normalizedValue(for: dragValue.startLocation.x, within: bounds, with: availableWidth)
                     updateValueWithDrag(dragValue: dragValue, availableWidth: availableWidth)
-                    checkSegmentChange(dragValue: dragValue, availableWidth: availableWidth)
                 }
             }.onEnded { _ in
                 onEditingChanged(false)
@@ -85,27 +75,11 @@ public struct SeekBar: View {
             .onChanged { dragValue in
                 onEditingChanged(true)
                 updateValueWithDrag(dragValue: dragValue, availableWidth: availableWidth)
-                checkSegmentChange(dragValue: dragValue, availableWidth: availableWidth)
             }
             .onEnded { _ in
                 dragStartOffset = 0
                 onEditingChanged(false)
             }
-    }
-    
-    private func checkSegmentChange(dragValue: DragGesture.Value, availableWidth: CGFloat) {
-        guard !timelineSegments.isEmpty else { return }
-        if let current = timelineSegments.first(where: { $0.startPoint <= value && value <= $0.endPoint }) {
-            if let currentSegment = currentSegment {
-                if current != currentSegment {
-                    self.currentSegment = current
-                    onSegmentChanged(current)
-                }
-            } else {
-                currentSegment = current
-                onSegmentChanged(current)
-            }
-        }
     }
     
     /// Calculates the offset for the handle based on the current value, bounds, and available width.

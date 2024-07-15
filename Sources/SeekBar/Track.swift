@@ -13,7 +13,6 @@ struct Track: View {
     let value: CGFloat
     var bufferedValue: CGFloat?
     let bounds: ClosedRange<CGFloat>
-    var timelineSegments: [TimelineSegmentPoint] = []
     
     var body: some View {
         Canvas { context, size in
@@ -47,21 +46,6 @@ struct Track: View {
                 height: size.height,
                 trackShape: trackShape
             )
-            
-            // Draws a gap between timeline segments if any exist.
-            if !timelineSegments.isEmpty {
-                var segmentContext = context
-                segmentContext.blendMode = .clear
-                
-                for segment in timelineSegments {
-                    segmentContext.drawGap(
-                        size: size,
-                        width: trackDimensions.segmentGap,
-                        height: size.height,
-                        segment: segment
-                    )
-                }
-            }
         }
         .drawingGroup()
     }
@@ -107,26 +91,6 @@ extension GraphicsContext {
         }
         self.fill(linePath, with: .color(color))
     }
-    
-    /// Draws a gap at the specified segment position.
-    ///
-    /// - Parameters:
-    ///   - size: The size of the canvas.
-    ///   - width: The width of the gap.
-    ///   - height: The height of the gap.
-    ///   - segment: The segment representing the position of the gap.
-    func drawGap(size: CGSize, width: CGFloat, height: CGFloat, segment: TimelineSegmentPoint) {
-        let segmentRect = CGRect(
-            x: size.width * segment.endPoint,
-            y: (size.height - height) / 2,
-            width: width,
-            height: height
-        )
-        let segmentPath = Path { path in
-            path.addRect(segmentRect)
-        }
-        self.fill(segmentPath, with: .color(.clear))
-    }
 }
 
 // MARK: - Preview
@@ -134,14 +98,6 @@ extension GraphicsContext {
 struct Track_Previews: PreviewProvider {
     static let trackWithBufferPreviewName = "Track With Buffer Preview"
     static let defaultTrackPreviewName = "Default Track Preview"
-    static let trackWithTimelinePreviewName = "Track With Timeline Preview"
-    
-    static let timelineSegments = [
-        TimelineSegmentPoint(name: "Timeline 1", startPoint: 0.0, endPoint: 0.2),
-        TimelineSegmentPoint(name: "Timeline 2", startPoint: 0.2, endPoint: 0.6),
-        TimelineSegmentPoint(name: "Timeline 3", startPoint: 0.6, endPoint: 0.8),
-        TimelineSegmentPoint(name: "Timeline 4", startPoint: 0.8, endPoint: 1.0),
-    ]
     
     static var previews: some View {
         Group {
@@ -155,12 +111,6 @@ struct Track_Previews: PreviewProvider {
                 .frame(height: 4)
                 .padding()
                 .previewDisplayName(trackWithBufferPreviewName)
-                .previewLayout(.sizeThatFits)
-            
-            Track(value: 0.3, bounds: 0.0...1.0, timelineSegments: timelineSegments)
-                .frame(height: 4)
-                .padding()
-                .previewDisplayName(trackWithTimelinePreviewName)
                 .previewLayout(.sizeThatFits)
         }
     }

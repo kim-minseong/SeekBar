@@ -31,7 +31,6 @@ func normalizedValue(for position: CGFloat, within bounds: ClosedRange<CGFloat>,
     let clampedPosition = min(max(0, position), availableWidth)
     let normalized = clampedPosition / availableWidth
     let steppedValue = (round(normalized * (bounds.upperBound - bounds.lowerBound) / step) * step) + bounds.lowerBound
-    //        return normalized * (bounds.upperBound - bounds.lowerBound) + bounds.lowerBound
     return steppedValue
 }
 

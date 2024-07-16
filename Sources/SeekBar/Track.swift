@@ -1,4 +1,6 @@
 /*
+ See the LICENSE.txt file for this project licensing information.
+ 
  Abstract:
  A view represents the default track for a seek bar.
  */

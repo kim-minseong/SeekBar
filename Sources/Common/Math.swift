@@ -1,4 +1,6 @@
 /*
+ See the LICENSE.txt file for this project licensing information.
+ 
  Abstract:
  The set of utility functions for mathematical calculations for related to SeekBar.
  */

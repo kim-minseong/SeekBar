@@ -1,4 +1,6 @@
 /*
+ See the LICENSE.txt file for this project licensing information.
+ 
  Abstract:
  Defines environment keys and their extensions related to handle customization.
  */

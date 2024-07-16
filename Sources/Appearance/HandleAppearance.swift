@@ -1,4 +1,6 @@
 /*
+ See the LICENSE.txt file for this project licensing information.
+ 
  Abstract:
  The models that represents the appearance settings for the handle.
  */

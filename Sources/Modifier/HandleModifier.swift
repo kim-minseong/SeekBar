@@ -1,4 +1,6 @@
 /*
+ See the LICENSE.txt file for this project licensing information.
+ 
  Abstract:
  A set of modifiers to customize the appearance of handle UI elements.
  */

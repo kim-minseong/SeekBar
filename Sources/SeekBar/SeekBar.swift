@@ -182,11 +182,6 @@ extension SeekBar {
         step: V.Stride = 0.000001,
         onEditingChanged: @escaping (Bool) -> Void = { _ in }
     ) where V : BinaryFloatingPoint, V.Stride : BinaryFloatingPoint {
-        precondition(
-            step > 0 && abs(CGFloat(step)) <= abs(CGFloat(bounds.upperBound - bounds.lowerBound)),
-            "Step value exceeds the bounds. The step value must be less than or equal to the range defined by the bounds"
-        )
-        
         self._value = Binding(
             get: { CGFloat(value.wrappedValue.clamped(in: bounds)) },
             set: { value.wrappedValue = V($0) }
@@ -213,11 +208,6 @@ extension SeekBar {
         step: V.Stride = 0.000001,
         onEditingChanged: @escaping (Bool) -> Void = { _ in }
     ) where V : BinaryFloatingPoint, V.Stride : BinaryFloatingPoint {
-        precondition(
-            step > 0 && abs(CGFloat(step)) <= abs(CGFloat(bounds.upperBound - bounds.lowerBound)),
-            "Step value exceeds the bounds. The step value must be less than or equal to the range defined by the bounds"
-        )
-        
         self._value = Binding(
             get: { CGFloat(value.wrappedValue.clamped(in: bounds)) },
             set: { value.wrappedValue = V($0) }

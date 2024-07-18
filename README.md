@@ -4,6 +4,9 @@
 
 The `SeekBar` component made with SwiftUI is designed to facilitate the easy display and manipulation of progress in video or audio players. It can also be used as a simple Slider.
 
+## 🧬 Samples
+If you want to see a sample usecase of a SeekBar, please check out the [SeekBarSamples](https://github.com/kim-minseong/SeekBarSamples)
+
 ## Usage
 
 Create a SeekBar like this:

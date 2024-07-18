@@ -29,7 +29,7 @@ import SeekBar
 
 struct YourView: View {
     @State private var value = 0.5
-    private var bufferedValue = 0.6
+    @State private var bufferedValue = 0.6
     
     var body: some View {
         SeekBar(value: $value, bufferedValue: bufferedValue)
@@ -41,9 +41,12 @@ struct YourView: View {
 
 ## Customization
 
-### Appearance
-`handleColors` - adjust handle colors.<br>
-`trackColors` - adjust track colors.
+### Color
+
+Add a `handleColors` or `trackColors` modifier to your SeekBar.
+
+`handleColors` - Set the colors of the handle.<br>
+`trackColors` - Set the colors of the track.
 
 ```swift
 SeekBar(value: $value)
@@ -51,6 +54,8 @@ SeekBar(value: $value)
     .trackColors(activeTrackColor: .indigo)
 ```
 <img src="Resources/seekbar-colors.png"/>
+
+### Dimensions
 
 `handleDimensions` - Set the dimensions of the handle, like size.<br>
 `trackDimensions` - Set the dimensions of the track, such as height and corner radius.
@@ -61,6 +66,8 @@ SeekBar(value: $value)
     .trackDimensions(trackHeight: 16)
 ```
 <img src="Resources/seekbar-dimension.png"/>
+
+### Appearance
 
 `seekBarDisplay` - Set the display mode for the SeekBar to show either the handle or only the track.
 ```swift
@@ -148,7 +155,7 @@ dependencies: [
 * iOS 15+
 * Xcode 12+
 
-### License
+## License
 ```
 MIT License
 
